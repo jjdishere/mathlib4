@@ -9,6 +9,8 @@ import Mathlib.Topology.Algebra.Valued.NormedValued
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.CategoryTheory.Preadditive.Basic
 
+universe u
+
 /-!
 # Perfectoid Rings and Perfectoid Fields
 -/
@@ -61,6 +63,53 @@ def valuedPerfectoidField (p : outParam ℕ) [Fact p.Prime] (K : Type*) [Field K
   exist_p_th_root := h.exist_p_th_root
 
 
+
+namespace ValuedPerfectoidField
+
+variable (p : outParam ℕ) [Fact p.Prime] (K : Type*) [Field K]
+
+/-- Scholze, Lemma 3.2 (p. 15), first half: the valuation of `p` is `< 1`, i.e.
+`p` is topologically nilpotent — a consequence of the pseudo-uniformizer
+condition `p ∈ (π^p)` for a non-unit `π` of `𝒪[K]` (the data version of the
+class: stated with the class's own valuation; the ∃-valuation form of
+`PerfectoidField` would need the equivalence-of-valuations machinery). -/
+theorem val_p_lt_1 [perf : ValuedPerfectoidField p K] : perf.toValued.v p < 1 := by
+  let v : Valuation K ℝ≥0 := perf.toValued.v
+  obtain ⟨π, hπ, hp⟩ := perf.exists_p_mem_span_pow_p
+  -- v π ≤ 1 (π ∈ 𝒪[K]) and v π ≠ 1 (π not a unit of 𝒪[K] ⟹ v π = 1 would be
+  -- a unit by the integer API), hence v π < 1
+  have hπ_le : v π.1 ≤ 1 := by
+    exact (Valuation.mem_integer_iff v π.1).mp (by simpa [v] using π.2)
+  have hπ_ne : v π.1 ≠ 1 := by
+    intro h1
+    have hunit : IsUnit π := (integer.integers v).isUnit_iff_valuation_eq_one.mpr (by
+      change v (π : K) = 1
+      simpa [v] using h1)
+    exact hπ hunit
+  have hπ_lt : v π.1 < 1 := lt_of_le_of_ne hπ_le hπ_ne
+  -- p = π^p · a for some a ∈ 𝒪[K]
+  rcases (Ideal.mem_span_singleton.mp hp) with ⟨a, ha⟩
+  -- v p = (v π)^p · v a
+  have hp_val : v (p : K) = v (π.1 : K) ^ p * v (a.1 : K) := by
+    have hco : (p : K) = (π.1 : K) ^ p * (a.1 : K) := by
+      exact_mod_cast ha
+    rw [hco, map_mul, map_pow]
+  have ha_le : v (a.1 : K) ≤ 1 := by
+    exact (Valuation.mem_integer_iff v (a.1 : K)).mp (by simpa [v] using a.2)
+  have hpow : v (π.1 : K) ^ p ≤ v (π.1 : K) := by
+    have hp1 : 1 ≤ p := by
+      have hp2 : 2 ≤ p := (Nat.Prime.two_le (Fact.out : p.Prime))
+      omega
+    simpa using pow_le_pow_of_le_one zero_le hπ_le (m := 1) (n := p) hp1
+  calc
+    v (p : K) = v (π.1 : K) ^ p * v (a.1 : K) := hp_val
+    _ ≤ v (π.1 : K) ^ p * 1 := mul_le_mul' le_rfl ha_le
+    _ = v (π.1 : K) ^ p := by rw [mul_one]
+    _ ≤ v (π.1 : K) := hpow
+    _ < 1 := hπ_lt
+
+end ValuedPerfectoidField
+
 namespace PerfectoidField
 
 variable (p : outParam ℕ) [Fact (p.Prime)] (K : Type*) {Γ : outParam Type*} [Field K]
@@ -74,14 +123,23 @@ def IsTopologicalNilpotent (x : K) : Prop := sorry
 -- Topological Nilpotent elements forms an ideal
 
 
-theorem val_p_lt_1 : vK.v p < 1 := sorry
+
 
 #check Module
 
-def Tilt := @_root_.Tilt K _ vK.v 𝒪[K] _ _ (integer.integers vK.v) p _ ⟨ne_of_lt <| val_p_lt_1 p K⟩
+def Tilt := @_root_.Tilt K _ vK.v 𝒪[K] _ _ (integer.integers vK.v) p _ ⟨ne_of_lt <|
+    (by
+      -- TODO(sfingali): the vK-based `val_p_lt_1` (for the arbitrary `Valued` in
+      -- the `PerfectoidField` context) needs the equivalence-of-valuations
+      -- machinery; the class-own-valuation version is proved as
+      -- `ValuedPerfectoidField.val_p_lt_1` above.
+      sorry)⟩
 
 noncomputable instance : Field (Tilt p K) := inferInstanceAs <|
-    Field (@_root_.Tilt K _ vK.v 𝒪[K] _ _ (integer.integers vK.v) p _ ⟨ne_of_lt <| val_p_lt_1 p K⟩)
+    Field (@_root_.Tilt K _ vK.v 𝒪[K] _ _ (integer.integers vK.v) p _ ⟨ne_of_lt <|
+      (by
+        -- TODO(sfingali): same as above.
+        sorry)⟩)
 -- C_p =
 
 variable (K : Type*) {Γ : outParam Type*} [Field K] [LinearOrderedCommGroupWithZero Γ]
@@ -102,10 +160,10 @@ def valuedRankOneValuationFiniteDimensional (K L : Type*) [Field K]
 -- `In the case L has is an extension of K complete with respect to a rank one valuation, L has a`
 -- `unique extension of valuation. But it cannot be an instance`
 
-instance ofFiniteDimensional (K L : Type*) [Field K]
+def ofFiniteDimensional (p : outParam ℕ) [Fact p.Prime] (K L : Type*) [Field K]
     [vK : Valued K ℝ≥0] [CompleteSpace K] [PerfectoidField p K] [Field L]
-    [Algebra K L] [FiniteDimensional K L] :
-    PerfectoidField p L:= sorry -- unifrom space structure comes from K v.s.
+    [Algebra K L] [FiniteDimensional K L] [UniformSpace L] :
+    PerfectoidField p L := sorry -- uniform space structure comes from K v.s.
 
 section FiniteExts
 
@@ -142,9 +200,9 @@ instance PerfectoidFieldOver.category (K : Type*) [Field K] :
     Category (PerfectoidFieldOver K) := sorry
 
 def PerfectoidField.TiltingFunctor : (PerfectoidFieldOver K) ⥤
-    (PerfectoidFieldOver (Tilt K vK.v 𝒪[K] (integer.integers vK.v) perf.p)) := sorry
+    (PerfectoidFieldOver (Tilt p K)) := sorry
 
 def PerfectoidField.TiltingFinExt : FiniteExtension K ≌
-    FiniteExtension (Tilt K vK.v 𝒪[K] (integer.integers vK.v) perf.p) := sorry
+    FiniteExtension (Tilt p K) := sorry
 
 end PerfectoidField
