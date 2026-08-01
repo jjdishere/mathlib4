@@ -17,7 +17,7 @@ universe u
 -/
 
 
-open Valuation Valued Function NNReal CategoryTheory
+open Valuation Valued Function NNReal CategoryTheory MonoidWithZeroHom.ValueGroup₀
 
 class PerfectoidField (p : outParam ℕ) [Fact p.Prime] (K : Type*) [Field K] [u : UniformSpace K]
     : Prop extends IsUniformAddGroup K, IsTopologicalDivisionRing K, CompleteSpace K where
@@ -128,18 +128,30 @@ def IsTopologicalNilpotent (x : K) : Prop :=
 `v (x^n) = (v x)^n → 0` and the sets `{y | v y < γ}` form a neighborhood
 basis of `0` in the valuation topology (the `is_topological_valuation` axiom
 of `Valued`). This is the standard fact behind Scholze, Lemma 3.2 / Wedhorn,
-Lemma 6.6: `p` is topologically nilpotent.
-
-Proof sketch: `rcases ((inferInstance : Valued K ℝ≥0).is_topological_valuation
-U).mp hU with ⟨γ, hγ⟩`; show `0 < γ.1` in the value group; then
-`NNReal.tendsto_pow_atTop_nhds_zero_of_lt_one hx` gives `(v x)^n → 0`, so
-eventually `v (x^n) = (v x)^n < γ.1`, i.e. `x^n ∈ {y | v y < γ.1} ⊆ U`.
-The remaining bridge is the `ValueGroup₀`/`restrict` API (the value group of
-the ℝ≥0-valuation is abstract in `is_topological_valuation`). -/
+Lemma 6.6: `p` is topologically nilpotent. -/
 theorem topologicallyNilpotent_of_val_lt_one {x : K} (hx : vK.v x < 1) :
     Filter.Tendsto (fun n : ℕ => x ^ n) Filter.atTop (nhds 0) := by
-  -- TODO(sfingali): ValueGroup₀/restrict bridge — see the docstring sketch.
-  sorry
+  intro U hU
+  have hU' : (0 : K) ∈ U := mem_of_mem_nhds hU
+  rcases ((inferInstance : Valued K ℝ≥0).is_topological_valuation U).mp hU with ⟨γ, hγ⟩
+  -- the value-group ball {r | r < embedding γ.1} is a neighborhood of 0 in ℝ≥0
+  have hγ0 : 0 < embedding γ.1 := by
+    have hne : embedding γ.1 ≠ 0 := by
+      simpa using (embedding_strictMono (v := vK.v)).injective.ne (Units.ne_zero γ)
+    exact lt_of_le_of_ne zero_le (Ne.symm hne)
+  have hset : {r : ℝ≥0 | r < embedding γ.1} ∈ nhds (0 : ℝ≥0) :=
+    isOpen_Iio.mem_nhds hγ0
+  have hpow : Filter.Tendsto (fun n : ℕ => (vK.v x) ^ n) Filter.atTop (nhds (0 : ℝ≥0)) :=
+    NNReal.tendsto_pow_atTop_nhds_zero_of_lt_one hx
+  have hevent : ∀ᶠ n in Filter.atTop, (vK.v x) ^ n < embedding γ.1 := by
+    simpa using hpow.eventually hset
+  change ∀ᶠ n in Filter.atTop, x ^ n ∈ U
+  filter_upwards [hevent] with n hn
+  exact hγ (by
+    -- v (x^n) = (v x)^n < embedding γ.1, and restrict_lt_iff_lt_embedding
+    change vK.v.restrict (x ^ n) < γ.1
+    rw [restrict_lt_iff_lt_embedding (v := vK.v)]
+    simpa [map_pow] using hn)
 
 
 
