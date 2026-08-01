@@ -123,41 +123,25 @@ nilpotent element f ∈ A there exists n ∈ ℕ such that f^n ∈ a" for every 
 ideal a — i.e. the powers are eventually in every neighborhood of 0. -/
 def IsTopologicalNilpotent (x : K) : Prop :=
   Filter.Tendsto (fun n : ℕ => x ^ n) Filter.atTop (nhds 0)
--- Topological nilpotent elements
 
--- Topological bounded elements forms a ring
--- Topological Nilpotent elements forms an ideal
+/-- If the valuation of `x` is `< 1`, then `x` is topologically nilpotent:
+`v (x^n) = (v x)^n → 0` and the sets `{y | v y < γ}` form a neighborhood
+basis of `0` in the valuation topology (the `is_topological_valuation` axiom
+of `Valued`). This is the standard fact behind Scholze, Lemma 3.2 / Wedhorn,
+Lemma 6.6: `p` is topologically nilpotent.
 
-
-
-
-#check Module
-
-def Tilt := @_root_.Tilt K _ vK.v 𝒪[K] _ _ (integer.integers vK.v) p _ ⟨ne_of_lt <|
-    (by
-      -- TODO(sfingali): the vK-based `val_p_lt_1` (for the arbitrary `Valued` in
-      -- the `PerfectoidField` context) needs the equivalence-of-valuations
-      -- machinery; the class-own-valuation version is proved as
-      -- `ValuedPerfectoidField.val_p_lt_1` above.
-      sorry)⟩
-
-noncomputable instance : Field (Tilt p K) := inferInstanceAs <|
-    Field (@_root_.Tilt K _ vK.v 𝒪[K] _ _ (integer.integers vK.v) p _ ⟨ne_of_lt <|
-      (by
-        -- TODO(sfingali): same as above.
-        sorry)⟩)
--- C_p =
-
-variable (K : Type*) {Γ : outParam Type*} [Field K] [LinearOrderedCommGroupWithZero Γ]
-    [vK : Valued K ℝ≥0] [CompleteSpace K] [perf : PerfectoidField p K]
+Proof sketch: `rcases ((inferInstance : Valued K ℝ≥0).is_topological_valuation
+U).mp hU with ⟨γ, hγ⟩`; show `0 < γ.1` in the value group; then
+`NNReal.tendsto_pow_atTop_nhds_zero_of_lt_one hx` gives `(v x)^n → 0`, so
+eventually `v (x^n) = (v x)^n < γ.1`, i.e. `x^n ∈ {y | v y < γ.1} ⊆ U`.
+The remaining bridge is the `ValueGroup₀`/`restrict` API (the value group of
+the ℝ≥0-valuation is abstract in `is_topological_valuation`). -/
+theorem topologicallyNilpotent_of_val_lt_one {x : K} (hx : vK.v x < 1) :
+    Filter.Tendsto (fun n : ℕ => x ^ n) Filter.atTop (nhds 0) := by
+  -- TODO(sfingali): ValueGroup₀/restrict bridge — see the docstring sketch.
+  sorry
 
 
--- This is not a proposition I need to proof in order to prove the final theorem.
-theorem PerfectoidField.isAlgClosed_iff_isAlgClosed_tilt (K : Type*) {Γ : outParam Type*}
-    [Field K] [LinearOrderedCommGroupWithZero Γ]
-    [vK : Valued K ℝ≥0] [CompleteSpace K] [perf : PerfectoidField p K] :
-    -- IsAlgClosed K ↔ IsAlgClosed (_root_.Tilt K vK.v 𝒪[K] (integer.integers vK.v) p ) := sorry
-    IsAlgClosed K ↔ IsAlgClosed (Tilt p K) := sorry
 
 def valuedRankOneValuationFiniteDimensional (K L : Type*) [Field K]
     [vK : Valued K ℝ≥0] [CompleteSpace K] [Field L] [Algebra K L] [FiniteDimensional K L] :
