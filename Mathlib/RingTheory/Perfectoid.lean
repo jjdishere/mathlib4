@@ -122,7 +122,7 @@ converge to zero. Wedhorn, Lemma 6.6 (p. 48): "for every topologically
 nilpotent element f ∈ A there exists n ∈ ℕ such that f^n ∈ a" for every open
 ideal a — i.e. the powers are eventually in every neighborhood of 0. -/
 def IsTopologicalNilpotent (x : K) : Prop :=
-  Filter.Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0)
+  Filter.Tendsto (fun n : ℕ => x ^ n) Filter.atTop (nhds 0)
 -- Topological nilpotent elements
 
 -- Topological bounded elements forms a ring
