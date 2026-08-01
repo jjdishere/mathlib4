@@ -8,6 +8,7 @@ import Mathlib.Topology.Algebra.Valued.ValuedField
 import Mathlib.Topology.Algebra.Valued.NormedValued
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.CategoryTheory.Preadditive.Basic
+import Mathlib.Topology.Algebra.InfiniteSum.Basic
 
 universe u
 
@@ -121,7 +122,7 @@ converge to zero. Wedhorn, Lemma 6.6 (p. 48): "for every topologically
 nilpotent element f ∈ A there exists n ∈ ℕ such that f^n ∈ a" for every open
 ideal a — i.e. the powers are eventually in every neighborhood of 0. -/
 def IsTopologicalNilpotent (x : K) : Prop :=
-  Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0)
+  Filter.Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0)
 -- Topological nilpotent elements
 
 -- Topological bounded elements forms a ring
