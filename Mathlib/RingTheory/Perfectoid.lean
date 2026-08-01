@@ -61,7 +61,14 @@ def valuedPerfectoidField (p : outParam ℕ) [Fact p.Prime] (K : Type*) [Field K
 -- (congrArg _ h.exists_val_top.choose_spec.symm)
   -- `should use above`
   v := h.exists_val_top.choose.v
-  is_topological_valuation := sorry
+  is_topological_valuation := by
+    -- the chosen valuation's topology equals `u` (exists_val_top.choose_spec)
+    have hnh : @nhds K (@UniformSpace.toTopologicalSpace K u) 0 =
+        @nhds K (@UniformSpace.toTopologicalSpace K h.exists_val_top.choose.toUniformSpace) 0 := by
+      rw [h.exists_val_top.choose_spec]
+    intro s
+    rw [hnh]
+    exact h.exists_val_top.choose.is_topological_valuation s
   exists_p_mem_span_pow_p := h.exists_p_mem_span_pow_p
   exist_p_th_root := h.exist_p_th_root
 
