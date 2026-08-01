@@ -190,9 +190,17 @@ instance PerfectoidFieldOver.category (K : Type*) [Field K] :
     Category (PerfectoidFieldOver K) := sorry
 
 def PerfectoidField.TiltingFunctor : (PerfectoidFieldOver K) ⥤
-    (PerfectoidFieldOver (Tilt p K)) := sorry
+    (PerfectoidFieldOver
+      (@_root_.Tilt K _ vK.v 𝒪[K] _ _ (integer.integers vK.v) p _
+        ⟨ne_of_lt <| (by
+          -- TODO(sfingali): as in `Tilt` (the vK-based `val_p_lt_1`).
+          sorry)⟩)) := sorry
 
 def PerfectoidField.TiltingFinExt : FiniteExtension K ≌
-    FiniteExtension (Tilt p K) := sorry
+    FiniteExtension
+      (@_root_.Tilt K _ vK.v 𝒪[K] _ _ (integer.integers vK.v) p _
+        ⟨ne_of_lt <| (by
+          -- TODO(sfingali): as in `Tilt` (the vK-based `val_p_lt_1`).
+          sorry)⟩) := sorry
 
 end PerfectoidField
