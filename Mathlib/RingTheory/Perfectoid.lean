@@ -69,11 +69,14 @@ namespace ValuedPerfectoidField
 
 variable (p : outParam ℕ) [Fact p.Prime] (K : Type*) [Field K]
 
-/-- Scholze, Lemma 3.2 (p. 15), first half: the valuation of `p` is `< 1`, i.e.
-`p` is topologically nilpotent — a consequence of the pseudo-uniformizer
-condition `p ∈ (π^p)` for a non-unit `π` of `𝒪[K]` (the data version of the
-class: stated with the class's own valuation; the ∃-valuation form of
-`PerfectoidField` would need the equivalence-of-valuations machinery). -/
+/-- The valuation of `p` is `< 1` — a consequence of the class's own
+`exists_p_mem_span_pow_p` axiom (a non-unit `π ∈ 𝒪[K]` with `p ∈ (π^p)`):
+writing `p = π^p · a` with `a ∈ 𝒪[K]`, one gets
+`v p = (v π)^p · v a ≤ (v π)^p ≤ v π < 1`.
+Cf. Scholze, Lemma 3.2 (p. 15) (the p-divisibility of the value group, proved
+from the same hypothesis — not formalized here) and Wedhorn, Lemma 6.6.
+Stated with the class's own valuation (the data version); the ∃-valuation
+form of `PerfectoidField` would need the equivalence-of-valuations machinery. -/
 theorem val_p_lt_1 [perf : ValuedPerfectoidField p K] : perf.toValued.v p < 1 := by
   let v : Valuation K ℝ≥0 := perf.toValued.v
   obtain ⟨π, hπ, hp⟩ := perf.exists_p_mem_span_pow_p
