@@ -116,7 +116,12 @@ variable (p : outParam ℕ) [Fact (p.Prime)] (K : Type*) {Γ : outParam Type*} [
     [LinearOrderedCommGroupWithZero Γ] [vK : Valued K ℝ≥0] [CompleteSpace K]
     [perf : PerfectoidField p K]
 
-def IsTopologicalNilpotent (x : K) : Prop := sorry
+/-- An element of a topological ring is *topologically nilpotent* if its powers
+converge to zero. Wedhorn, Lemma 6.6 (p. 48): "for every topologically
+nilpotent element f ∈ A there exists n ∈ ℕ such that f^n ∈ a" for every open
+ideal a — i.e. the powers are eventually in every neighborhood of 0. -/
+def IsTopologicalNilpotent (x : K) : Prop :=
+  Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0)
 -- Topological nilpotent elements
 
 -- Topological bounded elements forms a ring
