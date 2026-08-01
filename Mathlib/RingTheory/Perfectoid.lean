@@ -9,6 +9,8 @@ import Mathlib.Topology.Algebra.Valued.NormedValued
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.CategoryTheory.Preadditive.Basic
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
+import Mathlib.Data.ZMod.Basic
+import Mathlib.FieldTheory.Finite.Basic
 
 universe u
 
@@ -158,6 +160,19 @@ theorem topologicallyNilpotent_of_val_lt_one {x : K} (hx : vK.v x < 1) :
 
 
 
+/-- A perfectoid field is algebraically closed iff its tilt is. (The reverse
+direction via the untilt is out of scope; the statement is a placeholder in
+jjdishere's draft.) -/
+theorem isAlgClosed_iff_isAlgClosed_tilt (K : Type*) {Γ : outParam Type*}
+    [Field K] [LinearOrderedCommGroupWithZero Γ]
+    [vK : Valued K ℝ≥0] [CompleteSpace K] [perf : PerfectoidField p K] :
+    IsAlgClosed K ↔
+      IsAlgClosed (@_root_.Tilt K _ vK.v 𝒪[K] _ _ (integer.integers vK.v) p _
+        ⟨ne_of_lt <| (by
+          -- the vK-based `val_p_lt_1`; the equivalence-of-valuations machinery (see `Tilt`)
+          sorry)⟩) :=
+    sorry -- TODO(sfingali): both directions; the tilt of an algebraically closed field is algebraically closed (perfectoid-fields folklore)
+
 def valuedRankOneValuationFiniteDimensional (K L : Type*) [Field K]
     [vK : Valued K ℝ≥0] [CompleteSpace K] [Field L] [Algebra K L] [FiniteDimensional K L] :
     Valued L ℝ≥0 := sorry
@@ -219,3 +234,4 @@ def PerfectoidField.TiltingFinExt : FiniteExtension K ≌
           sorry)⟩) := sorry
 
 end PerfectoidField
+
