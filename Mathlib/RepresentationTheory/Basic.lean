@@ -201,7 +201,7 @@ variable (M : Type*) [AddCommMonoid M] [Module k[G] M]
 Note that the representation is built on `restrictScalars k k[G] M`,
 rather than on `M` itself.
 -/
-noncomputable def ofModule : Representation k G (RestrictScalars k k[G] M) :=
+noncomputable def ofModule : Representation k G (RestrictScalars' k k[G] M) :=
   (MonoidAlgebra.lift k _ G).symm (RestrictScalars.lsmul k k[G] M)
 
 /-!
@@ -224,9 +224,9 @@ we have `Module k[G] (restrictScalars k k[G] M)`.
 
 @[simp]
 theorem ofModule_asAlgebraHom_apply_apply (r : k[G])
-    (m : RestrictScalars k k[G] M) :
+    (m : RestrictScalars' k k[G] M) :
     ((ofModule M).asAlgebraHom r) m =
-      (RestrictScalars.addEquiv _ _ _).symm (r • RestrictScalars.addEquiv _ _ _ m) := by
+      (RestrictScalars.toMAddEquiv _ _).symm (r • RestrictScalars.toMAddEquiv _ _ m) := by
   apply MonoidAlgebra.induction_on r
   · intro g
     simp only [one_smul, MonoidAlgebra.lift_symm_apply, MonoidAlgebra.of_apply,
@@ -238,16 +238,16 @@ theorem ofModule_asAlgebraHom_apply_apply (r : k[G])
     simp only [w, map_smul, LinearMap.smul_apply, RestrictScalars.addEquiv_symm_map_smul_smul]
 
 @[simp]
-theorem ofModule_asModule_act (g : G) (x : RestrictScalars k k[G] ρ.asModule) :
+theorem ofModule_asModule_act (g : G) (x : RestrictScalars' k k[G] ρ.asModule) :
     ofModule ρ.asModule g x =
-      (RestrictScalars.addEquiv _ _ _).symm
-        (ρ.asModuleEquiv.symm (ρ g (ρ.asModuleEquiv (RestrictScalars.addEquiv _ _ _ x)))) := by
+      (RestrictScalars.toMAddEquiv _ _).symm
+        (ρ.asModuleEquiv.symm (ρ g (ρ.asModuleEquiv (RestrictScalars.toMAddEquiv _ _ x)))) := by
   dsimp [ofModule, RestrictScalars.lsmul_apply_apply]
   simp
 
 theorem smul_ofModule_asModule (r : k[G]) (m : (ofModule M).asModule) :
-    (RestrictScalars.addEquiv k _ _) ((ofModule M).asModuleEquiv (r • m)) =
-      r • (RestrictScalars.addEquiv k _ _) ((ofModule M).asModuleEquiv (G := G) m) := by
+    (RestrictScalars.toMAddEquiv _ _) ((ofModule M).asModuleEquiv (k := k) (r • m)) =
+      r • (RestrictScalars.toMAddEquiv _ _) ((ofModule M).asModuleEquiv (G := G) m) := by
   dsimp
   simp only [AddEquiv.apply_symm_apply, ofModule_asAlgebraHom_apply_apply]
 

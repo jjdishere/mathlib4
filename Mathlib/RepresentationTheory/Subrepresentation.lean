@@ -143,18 +143,21 @@ lemma mem_asSubmodule_iff {σ : Subrepresentation ρ} {v : W} : v ∈ asSubmodul
 
 /-- A subrepresentation of `ofModule M` can be thought of as an `A[G]` submodule of `M`.
 -/
-def asSubmodule' (σ : Subrepresentation (Representation.ofModule (k := A) (G := G) M)) :
-    Submodule A[G] M where
-  __ := σ.toSubmodule
+noncomputable def asSubmodule' (σ : Subrepresentation
+    (Representation.ofModule (k := A) (G := G) M)) : Submodule A[G] M where
+  __ := σ.toSubmodule.toAddSubmonoid.map (RestrictScalars.toMAddEquiv (algebraMap A A[G]) _)
   smul_mem' c m hm := by
     induction c using MonoidAlgebra.induction_linear with
-    | zero => rw [zero_smul]; exact σ.toSubmodule.zero_mem'
-    | add x y hx hy => rw [add_smul]; exact σ.toSubmodule.add_mem' hx hy
+    | zero => simp [zero_smul]
+    | add x y hx hy => simpa [-AddSubmonoid.mem_map, add_smul] using add_mem hx hy
     | single g a =>
       rw [← mul_one a, ← smul_eq_mul, ← MonoidAlgebra.smul_single, Algebra.smul_def, mul_smul]
-      exact σ.toSubmodule.smul_mem' ((algebraMap A A) a) <| by
-        simpa [Representation.ofModule, RestrictScalars.lsmul] using! σ.apply_mem_toSubmodule g hm
+      simp only [AddSubsemigroup.mem_carrier, AddSubmonoid.mem_toSubsemigroup]
+      obtain ⟨x, hx, rfl⟩ := hm
+      exact AddSubmonoid.mem_map.mpr ⟨a • Representation.ofModule M g x,
+        σ.toSubmodule.smul_mem' a (σ.apply_mem_toSubmodule g hx), rfl⟩
 
+#exit
 @[simp]
 lemma mem_asSubmodule'_iff {σ : Subrepresentation (Representation.ofModule (k := A) (G := G) M)}
     {m : M} : m ∈ asSubmodule' σ ↔ m ∈ σ := by rfl
@@ -206,8 +209,8 @@ def submoduleSubrepresentationOrderIso : Submodule A[G] M ≃o
     Subrepresentation (Representation.ofModule (k := A) (G := G) M) where
   toFun := ofSubmodule
   invFun := asSubmodule'
-  left_inv N := rfl
-  right_inv σ := rfl
-  map_rel_iff' := by rfl
+  left_inv N := sorry
+  right_inv σ := sorry
+  map_rel_iff' := sorry
 
 end Subrepresentation

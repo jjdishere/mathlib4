@@ -7,9 +7,7 @@ module
 
 public import Mathlib.Algebra.Algebra.Tower
 public import Mathlib.Algebra.Algebra.TransferInstance
-public import Mathlib.Algebra.Group.TransferInstance
 public import Mathlib.Algebra.Module.TransferInstance
-public import Mathlib.Algebra.Ring.TransferInstance
 
 /-!
 
@@ -155,12 +153,8 @@ def toMSemilinearMap [AddCommMonoid M] [Module S M] :
   map_add' := by simp
   map_smul' := by simp [smul_toM]
 
-@[simps]
-def ofAddHom [AddCommMonoid M] [Module S M] :
-    M →+ RestrictScalars f M where
-  toFun := RestrictScalars.of f
-  map_add' := by simp
-  map_zero' := rfl
+instance {R : Type*} [NonUnitalRing R] : NonUnitalRing (RestrictScalars f R) :=
+  fast_instance% (RestrictScalars.toMEquiv f R).nonUnitalRing
 
 instance {R : Type*} [Semiring R] : Semiring (RestrictScalars f R) :=
   fast_instance% (RestrictScalars.toMEquiv f R).semiring
@@ -168,11 +162,19 @@ instance {R : Type*} [Semiring R] : Semiring (RestrictScalars f R) :=
 instance {R : Type*} [Ring R] : Ring (RestrictScalars f R) :=
   fast_instance% (RestrictScalars.toMEquiv f R).ring
 
+instance {R : Type*} [NonUnitalCommRing R] : NonUnitalCommRing (RestrictScalars f R) :=
+  fast_instance% (RestrictScalars.toMEquiv f R).nonUnitalCommRing
+
 instance {R : Type*} [CommSemiring R] : CommSemiring (RestrictScalars f R) :=
   fast_instance% (RestrictScalars.toMEquiv f R).commSemiring
 
 instance {R : Type*} [CommRing R] : CommRing (RestrictScalars f R) :=
   fast_instance% (RestrictScalars.toMEquiv f R).commRing
+
+def nonUnitalRingEquiv {A : Type*} [NonUnitalRing A] : RestrictScalars f A ≃+* A where
+  __ := toMEquiv f A
+  map_mul' _ _ := rfl
+  map_add' _ _ := rfl
 
 /-- Tautological ring isomorphism `RestrictScalars R S A ≃+* A`. -/
 def ringEquiv {A : Type*} [Semiring A] : RestrictScalars f A ≃+* A where

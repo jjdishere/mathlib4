@@ -45,12 +45,12 @@ variable {A : Type w} [Ring A] [Algebra k A]
 /-- Type synonym for considering a module over a `k`-algebra as a `k`-module. -/
 @[instance_reducible]
 def moduleOfAlgebraModule (M : ModuleCat.{v} A) : Module k M :=
-  Module.restrictScalars k A M
+  Module.compHom _ (algebraMap k A)
 
 attribute [scoped instance] ModuleCat.moduleOfAlgebraModule
 
 theorem isScalarTower_of_algebra_moduleCat (M : ModuleCat.{v} A) : IsScalarTower k A M :=
-  IsScalarTower.restrictScalars k A M
+  IsScalarTower.of_compHom _ _ _
 
 attribute [scoped instance] ModuleCat.isScalarTower_of_algebra_moduleCat
 
@@ -58,6 +58,6 @@ attribute [scoped instance] ModuleCat.isScalarTower_of_algebra_moduleCat
 example (M N : ModuleCat.{v} A) : Module k (M ⟶ N) := inferInstance
 
 instance linearOverField : Linear k (ModuleCat.{v} A) where
-  homModule _ _ := inferInstance
+  homModule M N := inferInstance
 
 end ModuleCat

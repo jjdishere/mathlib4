@@ -85,8 +85,8 @@ lemma _root_.LinearMap.map_mul_of_map_mul_tmul {f : A ⊗[R] B →ₗ[S] C}
     (x y : A ⊗[R] B) : f (x * y) = f x * f y :=
   f.map_mul_iff.2 (by
     -- these instances are needed by the statement of `ext`, but not by the current definition.
-    let : Algebra R C := .restrictScalars R S C
-    let : IsScalarTower R S C := .restrictScalars R S C
+    let : Algebra R C := Algebra.compHom C (algebraMap R S)
+    let : IsScalarTower R S C := IsScalarTower.of_compHom _ _ _
     ext
     dsimp
     exact hf _ _ _ _) x y

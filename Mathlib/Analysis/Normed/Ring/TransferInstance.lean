@@ -34,4 +34,14 @@ protected abbrev normedRing [NormedRing β] (e : α ≃ β) : NormedRing α :=
   letI := e.ring
   .induced α β e.ringEquiv e.injective
 
+protected abbrev seminormedCommRing [SeminormedCommRing β] (e : α ≃ β) :
+    SeminormedCommRing α :=
+  letI := e.commRing
+  .induced α β e.ringEquiv
+
+protected abbrev normedCommRing [NormedCommRing β] (e : α ≃ β) :
+    NormedCommRing α :=
+  letI := e.commRing
+  .induced α β e.ringEquiv e.injective
+
 end Equiv

@@ -6,6 +6,7 @@ Authors: Sébastien Gouëzel
 module
 
 public import Mathlib.Analysis.Complex.Order
+public import Mathlib.Analysis.Normed.Module.RestrictScalars
 public import Mathlib.Analysis.RCLike.Basic
 public import Mathlib.Basic.Complex.BigOperators
 public import Mathlib.LinearAlgebra.Complex.Module

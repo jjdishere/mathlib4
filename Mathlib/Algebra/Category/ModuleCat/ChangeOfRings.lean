@@ -701,9 +701,8 @@ def HomEquiv.toRestrictScalars {X : ModuleCat R} {Y : ModuleCat S}
     map_add' := fun _ _ => by dsimp; rw [tmul_add, map_add]
     map_smul' := fun r s => by
       dsimp
-      rw [RestrictScalars.smul_def, ← LinearMap.map_smul]
-      erw [tmul_smul]
-      congr }
+      rw [tmul_smul, ← LinearMap.map_smul]
+      rfl }
 
 set_option backward.isDefEq.respectTransparency false in
 -- Porting note: forced to break apart fromExtendScalars due to timeouts

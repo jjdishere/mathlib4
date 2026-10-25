@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Algebra.Algebra.RestrictScalars
 public import Mathlib.Algebra.Lie.TensorProduct
+public import Mathlib.Algebra.Lie.TransferInstance
 
 /-!
 # Extension and restriction of scalars for Lie algebras and Lie modules
@@ -143,17 +144,18 @@ end ExtendScalars
 namespace RestrictScalars
 
 
-variable [h : LieRing L]
+variable [LieRing L]
 
-instance : LieRing (RestrictScalars R A L) :=
-  h
+instance [Semiring R] [Semiring A] (f : R →+* A) : LieRing (RestrictScalars f L) :=
+  fast_instance% (RestrictScalars.toMAddEquiv _ _).lieRing
 
 variable [CommRing A] [LieAlgebra A L]
 
-set_option backward.isDefEq.respectTransparency false in
-instance lieAlgebra [CommRing R] [Algebra R A] : LieAlgebra R (RestrictScalars R A L) where
-  lie_smul t x y := (lie_smul (algebraMap R A t) (RestrictScalars.addEquiv R A L x)
-    (RestrictScalars.addEquiv R A L y) :)
+instance lieAlgebra [CommRing R] [Algebra R A] : LieAlgebra R (RestrictScalars' R A L) where
+  lie_smul t x y := by rw [RestrictScalars.smul_def, RestrictScalars.smul_def,
+    AddEquiv.eq_symm_apply, (RestrictScalars.toMAddEquiv (algebraMap R A) L).bracket_def x y,
+    AddEquiv.apply_symm_apply, ← lie_smul, (RestrictScalars.toMAddEquiv
+    (algebraMap R A) L).bracket_def, AddEquiv.apply_symm_apply, AddEquiv.apply_symm_apply]
 
 end RestrictScalars
 

@@ -231,15 +231,21 @@ instance of_projective [Projective R M] : Flat R M :=
 
 instance of_free [Free R M] : Flat R M := inferInstance
 
-instance {S} [CommSemiring S] [Algebra R S] [Module S M] [IsScalarTower R S M]
+instance {S : Type w} [CommSemiring S] [Algebra R S] [Module S M] [IsScalarTower R S M]
     [Flat S M] [Flat R N] : Flat S (M ⊗[R] N) :=
-  iff_rTensor_injectiveₛ.mpr fun P _ _ I ↦ by
-    let := RestrictScalars.moduleOrig R S P
-    change Submodule S (RestrictScalars R S P) at I
-    change Function.Injective (rTensor _ I.subtype)
-    simpa [AlgebraTensorModule.rTensor_tensor] using!
-      rTensor_preserves_injective_linearMap (.restrictScalars R <| I.subtype.rTensor M)
-      (rTensor_preserves_injective_linearMap _ I.injective_subtype)
+  iff_rTensor_preserves_injective_linearMapₛ.mpr fun (P P' : Type w) _ _ _ _ f hf ↦ by
+    let := RestrictScalars.moduleOrig (algebraMap R S) P
+    let := RestrictScalars.moduleOrig (algebraMap R S) P'
+    let e := (RestrictScalars.toMAddEquiv (algebraMap R S) P).linearEquiv S
+    let e' := (RestrictScalars.toMAddEquiv (algebraMap R S) P').linearEquiv S
+    let g := e'.symm.toLinearMap ∘ₗ f ∘ₗ e.toLinearMap
+    have : Injective (g.rTensor (M ⊗[R] N)) := by
+      simpa [AlgebraTensorModule.rTensor_tensor] using!
+        rTensor_preserves_injective_linearMap (.restrictScalars R <| g.rTensor M)
+          (rTensor_preserves_injective_linearMap _ (e'.symm.injective.comp (hf.comp e.injective)))
+    have hf' : f = e'.toLinearMap ∘ₗ g ∘ₗ e.symm.toLinearMap := by ext; simp [g]
+    rw [hf', rTensor_comp, rTensor_comp]
+    exact (e'.rTensor _).injective.comp (this.comp (e.symm.rTensor _).injective)
 
 example [Flat R M] [Flat R N] : Flat R (M ⊗[R] N) := inferInstance
 

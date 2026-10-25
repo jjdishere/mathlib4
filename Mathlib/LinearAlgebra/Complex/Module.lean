@@ -116,7 +116,7 @@ example : (Semiring.toNatAlgebra : Algebra ℕ ℂ) = Complex.instAlgebraOfReal 
 example : (Ring.toIntAlgebra ℂ : Algebra ℤ ℂ) = Complex.instAlgebraOfReal := by
   with_reducible_and_instances rfl
 
-example : Module.restrictScalars ℝ ℂ ℂ = Complex.instModule := by
+example : Module.compHom ℂ (algebraMap ℝ ℂ) = Complex.instModule := by
   with_reducible_and_instances rfl
 
 section
@@ -168,13 +168,13 @@ end Complex
 vector space. -/
 instance (priority := 900) Module.complexToReal (E : Type*) [AddCommGroup E] [Module ℂ E] :
     Module ℝ E :=
-  .restrictScalars ℝ ℂ E
+  Module.compHom _ (algebraMap ℝ ℂ)
 
 /-- Register as an instance (with low priority) the fact that a complex algebra is also a real
 algebra. -/
 instance (priority := 900) Algebra.complexToReal {A : Type*} [Semiring A] [Algebra ℂ A] :
     Algebra ℝ A :=
-  .restrictScalars ℝ ℂ A
+  Algebra.compHom _ (algebraMap ℝ ℂ)
 
 -- try to make sure we're not introducing diamonds but we will need
 -- `reducible_and_instances` which currently fails https://github.com/leanprover-community/mathlib4/issues/10906
